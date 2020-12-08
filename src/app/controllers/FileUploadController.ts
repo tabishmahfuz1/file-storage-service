@@ -36,7 +36,7 @@ export class FileUploadController extends Controller {
             extension,
             directory: req.body.directory || '',
             mimetype: req.body.mimetype || req.file.mimetype,
-            labels: JSON.parse(req.body.labels)
+            labels: req.body.labels? JSON.parse(req.body.labels) : []
         };
 
         const res = this.readFileFromPath(req.file.path)

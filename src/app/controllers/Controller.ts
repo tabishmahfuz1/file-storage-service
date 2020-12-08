@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { Logger } from '../Log';
 import { TYPES } from '../types';
 import { injectable, inject } from 'inversify';
@@ -26,7 +26,7 @@ export default abstract class Controller {
      * @param req Express.Request The Request Received
      * @param res Express.Response The Response Express Object
      */
-    async process(req: Request, res: Response): Promise<any> {
+    async process(req: Request, res: Response, next: NextFunction): Promise<any> {
         this.req = req
         this.res = res
 
@@ -37,7 +37,7 @@ export default abstract class Controller {
             if ( this.requiresAuthentication ) {
                 this.enforceAuth();
             }
-            let response = await this.handle(req);
+            let response = await this.handle(req, res);
             let duration = performance.now() - t0;
             if (!this.responseSent) {
                 res.json({
@@ -62,7 +62,8 @@ export default abstract class Controller {
                     message: err.message
                 });
             } else {
-                throw err
+                this.logger.error("INTERNAL_ERROR", err);
+                next(err);
             }
         }
     }
@@ -83,7 +84,7 @@ export default abstract class Controller {
      * Needs to be implemented  
      * @param req The Request Object
      */
-    abstract handle(req): Promise<any>
+    abstract handle(req, res?: Response): Promise<any>
 }
 
 export class ApiError extends Error {

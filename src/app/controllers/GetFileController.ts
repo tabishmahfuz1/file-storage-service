@@ -3,6 +3,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../types";
 import { IFileRepository } from "../database/repositories/FileRepository";
 import { IStorage } from "../providers/Storage";
+import { Response } from "express";
 
 @injectable()
 export class GetFileController extends Controller {
@@ -14,14 +15,14 @@ export class GetFileController extends Controller {
         super();
     }
 
-    async handle({ params: { id } }: any): Promise<any> {
+    async handle({ params: { id } }: any, res?: Response): Promise<any> {
         const { path, name } =  await this._fileRepo.findById(id);
         const file = await this._storage.get(path);
 
-        this.res.setHeader('Content-Disposition', 'attachment; filename=' + name);
-        this.res.setHeader('Content-Transfer-Encoding', 'binary');
+        res.setHeader('Content-Disposition', 'attachment; filename=' + name);
+        res.setHeader('Content-Transfer-Encoding', 'binary');
         // this.res.setHeader('Content-Type', 'application/octet-stream');
-        this.res.send(file);
+        res.send(file);
         this.responseSent = true;
     }
 

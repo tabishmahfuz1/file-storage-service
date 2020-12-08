@@ -45,8 +45,8 @@ export default abstract class Routes implements Registerable {
 		method?: string, 
 		middlewares?: RouteMiddleware[]): any {
 
-        this.router[method ?? 'all'](`${path}`, middlewares ?? [], (req, res) => {
-			controller.process(req, res);
+        this.router[method ?? 'all'](`${path}`, middlewares ?? [], (req, res, next) => {
+			controller.process(req, res, next);
 		})
 	}
 	
